@@ -29,43 +29,49 @@ namespace dungeon {
 
 // ---- 1. Merge sort ------------------------------------------------------
 
+    void Merge(std::vector<Item>& inventory, std::size_t lo, std::size_t mid, std::size_t hi, const Comparator& cmp) {
+        std::vector<Item> scratch;
+		scratch.reserve(hi - lo); // reserve space for the merged range
+        std::size_t i = lo;
+		std::size_t j = mid;
+
+        while (i < mid && j < hi) {
+            if (!cmp(inventory[j], inventory[i])) { // right does NOT precede left
+                scratch.push_back(inventory[i]); // -> take the LEFT item
+                i++;
+            }
+            else {
+                scratch.push_back(inventory[j]); // -> take the RIGHT item
+                j++;
+            }
+        }
+
+        while (i < mid) { // whatever is left in the left half
+            scratch.push_back(inventory[i]);
+            i++;
+        }
+        while (j < hi) { // whatever is left in the right half
+            scratch.push_back(inventory[j]);
+            j++;
+        }
+        for (std::size_t k = 0; k < scratch.size(); ++k) { // write back over [lo, hi)
+            inventory[lo + k] = scratch[k];
+        }
+    }
+
+    void MergeSortImpl(std::vector<Item>& inventory, std::size_t lo, std::size_t hi, const Comparator& cmp) {
+        if ((hi - lo) < 2) {
+            return;
+        }
+        std::size_t mid = lo + (hi - lo) / 2;
+        MergeSortImpl(inventory, lo, mid, cmp);
+        MergeSortImpl(inventory, mid, hi, cmp);
+        Merge(inventory, lo, mid, hi, cmp);
+        return;
+    }
+
 void mergeSort(std::vector<Item>& inventory, const Comparator& cmp) {
-    // TODO Floor 2 (Mon): implement merge sort.
-    //
-    // Think before you type:
-    //   - Merge sort is STABLE. That means: when two items compare equal
-    //     (same weight, say), the one that started earlier stays earlier.
-    //     The starter inventory has Iron key and Loaf of bread both at
-    //     weight 0.1, Iron key first. After `sort inventory by weight`,
-    //     which must come first? *Which line in your merge code is the
-    //     one that enforces that?* (Hint: the tie-breaking comparison.)
-    //   - Merge sort needs O(n) scratch space to merge. Could you merge
-    //     two sorted halves in place without extra memory? Yes — and it's
-    //     wildly slower. Don't try. The scratch buffer IS the algorithm.
-    //   - Base case for a half-open range [lo, hi): when does the range
-    //     hold zero or one element? That range is already "sorted" —
-    //     return immediately.
-    //   - Computing mid: `lo + (hi - lo) / 2`, not `(lo + hi) / 2`. Same
-    //     overflow habit you built in Floor 1.
-    //
-    // If you need structural hints — write two helpers in an anonymous
-    // namespace above this function:
-    //
-    //   static void mergeSortImpl(std::vector<Item>& v,
-    //                             std::size_t lo, std::size_t hi,
-    //                             const Comparator& cmp);
-    //   static void merge         (std::vector<Item>& v,
-    //                             std::size_t lo, std::size_t mid,
-    //                             std::size_t hi,
-    //                             const Comparator& cmp);
-    //
-    // mergeSort() itself just calls mergeSortImpl(v, 0, v.size(), cmp).
-    //
-    // In merge(): copy both halves into a scratch buffer, then walk both
-    // halves taking the smaller front element. On a tie take from the
-    // LEFT half — that one line is what keeps the sort stable.
-    (void)inventory;
-    (void)cmp;
+    MergeSortImpl(inventory, 0, inventory.size(), cmp);
 }
 
 // ---- 2. Quicksort -------------------------------------------------------
