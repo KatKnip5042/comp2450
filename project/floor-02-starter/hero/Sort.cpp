@@ -76,50 +76,35 @@ void mergeSort(std::vector<Item>& inventory, const Comparator& cmp) {
 
 // ---- 2. Quicksort -------------------------------------------------------
 
+std::size_t partition(std::vector<Item>& inventory, std::size_t lo, std::size_t hi, const Comparator& cmp) {
+    std::size_t pivotIndex = lo + (hi - lo) / 2; // middle element as pivot
+    std::swap(inventory[pivotIndex], inventory[hi]); // move pivot to the end
+    const Item& pivot = inventory[hi];
+    std::size_t store = lo;
+    for (std::size_t j = lo; j < hi; ++j) {
+        if (cmp(inventory[j], pivot)) { // if inventory[j] should come before pivot
+            std::swap(inventory[store], inventory[j]);
+            store++;
+        }
+    }
+    std::swap(inventory[store], inventory[hi]); // move pivot to its final place
+	return store; // return the index of the pivot
+}
+
+void quicksortImpl(std::vector<Item>& inventory, std::size_t lo, std::size_t hi, const Comparator& cmp) {
+    if (lo < hi) {
+        std::size_t p = partition(inventory, lo, hi, cmp);
+        if (p > 0) {
+            quicksortImpl(inventory, lo, p - 1, cmp);
+        }
+        quicksortImpl(inventory, p + 1, hi, cmp);
+    }
+}
+
 void quicksort(std::vector<Item>& inventory, const Comparator& cmp) {
-    // TODO Floor 2 (Wed): implement quicksort.
-    //
-    // Think before you type:
-    //   - Quicksort's whole performance story depends on the PIVOT. If
-    //     the pivot splits the range roughly in half each time, you get
-    //     O(n log n). If the pivot always ends up at one end (everything
-    //     goes to one side), you get O(n^2). Why does the FIRST element
-    //     cause that on sorted input? Sketch it on paper for [1,2,3,4,5].
-    //   - Your fix is the MIDDLE element. It's not bulletproof — an
-    //     adversary could still construct a worst-case input — but it
-    //     kills the most common pathology (sorted / reverse-sorted data),
-    //     which is exactly the shape real users produce.
-    //   - `std::size_t` is unsigned. When `p == 0`, what is `p - 1`?
-    //     That wrap-around will send your left-side recursion to index
-    //     18 quintillion. Guard it.
-    //   - Is quicksort stable? (Answer: no — and that is why production
-    //     std::sort is ALSO not stable. If you need stability, reach for
-    //     std::stable_sort or your mergeSort.)
-    //
-    // If you need structural hints — helpers in an anonymous namespace:
-    //
-    //   static std::size_t partition  (std::vector<Item>& v,
-    //                                  std::size_t lo, std::size_t hi,
-    //                                  const Comparator& cmp);
-    //   static void        quicksortImpl(std::vector<Item>& v,
-    //                                    std::size_t lo, std::size_t hi,
-    //                                    const Comparator& cmp);
-    //
-    // Closed range convention for quicksort: [lo, hi] — both inclusive.
-    // Textbooks use this for Lomuto partition; it is fine here. Guard
-    // the recursive call `quicksortImpl(v, lo, p - 1, cmp)` with
-    // `if (p > lo) ...` so you do not underflow when p == 0.
-    //
-    // PIVOT: use the middle element — `lo + (hi - lo) / 2`. Move it to
-    //        the end (swap it with v[hi]) and then do the standard
-    //        Lomuto scan with the pivot now at v[hi].
-    //
-    // If you are curious what the FIRST-element pivot looks like: the
-    // benchmark harness has a `--bad-pivot` option that runs exactly
-    // that. You do NOT need to implement it yourself; the harness
-    // ships its own copy for Lab purposes.
-    (void)inventory;
-    (void)cmp;
+    if (!inventory.empty()) {
+        quicksortImpl(inventory, 0, inventory.size() - 1, cmp);
+    }
 }
 
 // ---- 3. sortInventory (the seam) ----------------------------------------
