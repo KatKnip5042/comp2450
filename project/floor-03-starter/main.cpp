@@ -135,7 +135,13 @@ int main() {
             // it still calls Floor 1's monster-only findMonster.
             const Monster* m = findMonster(bestiary, rest);
             if (m) { printMonster(*m); continue; }
-            std::cout << "No such creature stalks this Keep.\n";
+
+			const Item* it = findByName(hero.inventory, rest);
+            if (it) {
+                std::cout << "  " << it->name << "  (wt " << it->weight << ", val " << it->value << ")\n";
+				continue;
+            }
+            std::cout << "No such creature/item stalks this Keep.\n";
         }
         else if (cmd == "inventory") {
             printInventory(hero);
