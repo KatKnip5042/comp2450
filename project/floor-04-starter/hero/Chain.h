@@ -96,6 +96,7 @@ public:
     // (clear() does the same job — implement it below and call it from
     // the destructor body if you prefer one source of truth.)
     ~Chain() {
+        clear();
         // TODO Floor 4 (Wednesday)
     }
 
@@ -166,6 +167,14 @@ public:
     //
     // TODO Floor 4 (Wednesday). Same loop as the destructor.
     void clear() {
+		Node* p = head_;
+        while (p != nullptr) {
+            Node* n = p->next;
+            delete p;
+            p = n;
+		}
+		head_ = nullptr;
+		size_ = 0;
         // TODO Wednesday
     }
 
