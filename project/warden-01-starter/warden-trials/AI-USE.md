@@ -17,7 +17,7 @@ I used Quillbot to count the words used.
 
 This trial **requires** AI use. The full prompt + reply + critique are in `trial-2-critique.md`. If you used a different LLM for any other reason on this trial (e.g., to look up syntax), declare it here:
 
-(your declaration)
+I used ChatGPT as my LLM for this trial as well as Quillbot to count the words used. I also used google which auto-generated an AI response when I searched for what std::max_element is.
 
 ## Trial III — The Encounter
 
