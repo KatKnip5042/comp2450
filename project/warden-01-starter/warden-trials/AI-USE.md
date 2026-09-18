@@ -11,7 +11,7 @@ Example entries:
 
 ## Trial I — The Foundations Brief
 
-(your declaration)
+I used Quillbot to count the words used.
 
 ## Trial II — The Critique
 

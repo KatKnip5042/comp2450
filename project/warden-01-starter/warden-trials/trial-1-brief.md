@@ -12,7 +12,7 @@ AI is welcome to *check* your answers; it is not welcome to *write your sentence
 
 > Your battle's "Use item" menu shows the *currently usable* items in your hero's inventory on this turn. Name the right ADT for that menu. Defend the choice against its closest neighbour (e.g., why `bag` instead of `set`, or `list` instead of `bag`).
 
-(your answer — 50–100 words)
+The ADT I would choose for this is the bag. The hero's inventory is already stored in a bag to allow duplicates, unlike a set. In a list, the order is important, whereas for this all we need to do is pick any item no matter where.
 
 ---
 
@@ -20,7 +20,7 @@ AI is welcome to *check* your answers; it is not welcome to *write your sentence
 
 > Your inventory is kept sorted by healing power (in this codebase an item's `value` measures its potency, so `value` plays the healing-power role). The player types `use Healing potion`. Linear or binary search to find it by name? Justify, and give the Big-O for each.
 
-(your answer — 50–100 words)
+Binary would be better here since my inventory is sorted. Because it is sorted, Binary would have a big-O of O(log n) while linear would have a big-O of O(n). Even with the search being by name, the computer knows the value of each name and the list is sorted by the value. This is similar to the challenge on paper we had at the start of class. Each binary sort splits the list to check in 2 rather than go through every single item, which as we progress through the game and gain more loot becomes crucial to not slowing down the game rate.
 
 ---
 
@@ -32,13 +32,13 @@ AI is welcome to *check* your answers; it is not welcome to *write your sentence
 
 ```cpp
 // by healing power — i.e. by value
-auto byValue  = /* your lambda */;
+auto byValue = [](const Item& a, const Item& b) { return a.value < b.value; };
 
 // by weight
-auto byWeight = /* your lambda */;
+auto byWeight = [](const Item& a, const Item& b) {return a.weight < b.weight; };
 ```
 
-(one-sentence answer — what language feature?)
+The language feature that makes one `std::sort` call serve both orders is the comparator/lambda because it allows the sort to be told how to sort stuff and it just sorts it.
 
 ---
 
@@ -46,4 +46,4 @@ auto byWeight = /* your lambda */;
 
 > Why does `Bag<T>` live in `Bag.h` instead of `Bag.cpp`? And: when the player types `9` for a 4-option menu, where in your code should the validation **throw**, and where should it **catch**?
 
-(your answer — 50–100 words)
+Bag<T> lives in 'Bag.h' instead of 'Bag.cpp' because templates must be defined in the same file otherwise it would only compile for the types that are named in the .cpp file. When the player types `9` for a 4-option menu, within the try in main the .at() within the Bag<T> should throw and be caught in main by catch, allowing the game to continue.
