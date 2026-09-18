@@ -74,6 +74,16 @@ namespace dungeon {
 
 namespace {
 
+    void ShowMenu(int& choice) {
+        std::cout << "The Warden approaches. What do you do?\n"
+            << "1. Attack\n"
+            << "2. Use Item\n"
+            << "3. Inspect Warden\n"
+            << "4. Flee\n"
+            << "Enter the number of your choice: ";
+        std::cin >> choice;
+    }
+
 // =====================================================================
 // Tunable battle parameters. Edit to taste; document any tuning in
 // encounter-notes.md so the grader knows what to expect.
@@ -86,6 +96,56 @@ constexpr int kWardenAttackDmg = 4;   // warden's retaliation damage
 }  // anonymous namespace
 
 BattleOutcome runWardenBattle(Hero& hero) {
+	int playerHP = kPlayerStartHP;
+	int wardenHP = kWardenStartHP;
+
+    while (playerHP > 0 && wardenHP > 0) {
+        std::cout << "-- Your turn --" << std::endl << "Player HP : " << playerHP << "   Warden HP : " << wardenHP << std::endl;
+        try {
+            int choice;
+            ShowMenu(choice);
+            if (choice < 1 || choice > 4) {
+                throw BattleException("Invalid choice of action");
+            }
+            if (choice == 1) {
+				std::cout << "You bravely strike the warden for " << kPlayerAttackDmg << " damage!" << std::endl;
+                wardenHP -= kPlayerAttackDmg;
+                if (wardenHP > 0) {
+                    playerHP -= kWardenAttackDmg;
+                    std::cout << "Unfortunately, you have not defeated the warden and he strikes back for " << kWardenAttackDmg << " damage! Your HP is now: " << playerHP << std::endl;
+                }
+            }
+            else if (choice == 2) {
+                using Comparator = std::function<bool(const Item&, const Item&)>;
+                bool sortInventory(Hero & hero, const std::string & criterion);
+                void printInventory(const Hero & hero);
+                std::string name;
+				std::cout << "Name the item you desire to use: " << std::endl;
+				std::cin >> name;
+                const Item* it = findByName<Item>(hero.inventory, name);
+                if (!it) {
+					throw BattleException("Item not found in inventory");
+                }
+                else {
+                    playerHP += 5;
+                    std::cout << "You feel strength return to your body. Your HP is now: " << playerHP << std::endl;
+                }
+            }
+            else if (choice == 3) {
+                std::cout << "Warden HP : " << wardenHP << std::endl;
+            }
+            else if (choice == 4) {
+                return BattleOutcome::Fled;
+            }
+        }
+        catch (const std::exception& e) {                        // [F3 — catch]
+            std::cout << "  " << e.what() << "  Try again.\n";
+            continue;   // re-prompt; turn does NOT advance
+        }
+    }
+    return wardenHP <= 0 ? BattleOutcome::Victory  : BattleOutcome::Defeat;
+
+
     // TODO — write the boss battle. Suggested outline (yours to refactor):
     //
     //   int playerHP = kPlayerStartHP;
@@ -127,10 +187,6 @@ BattleOutcome runWardenBattle(Hero& hero) {
     //
     // Replace the placeholder body below.
 
-    (void)hero;
-    std::cout << "  (Battle scaffold — runWardenBattle is not yet written.)\n"
-              << "  (Open battle/Battle.cpp and follow the TODOs.)\n";
-    return BattleOutcome::Fled;
 }
 
 }  // namespace dungeon
