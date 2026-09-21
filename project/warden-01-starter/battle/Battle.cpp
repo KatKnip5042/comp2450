@@ -180,50 +180,40 @@ namespace dungeon {
                 printMenu(menu, playerHP, wardenHP);
 
                 switch (readMenuChoice(menu)) {
-                case MenuAction::Attack:{
-                        wardenHP -= kPlayerAttackDmg;
-                        std::cout << "You strike for " << kPlayerAttackDmg << " damage. Warden HP: " << std::max(wardenHP, 0) << "\n";
-                    }
-                }
-            }
-        }
+                case MenuAction::Attack: {
+                    wardenHP -= kPlayerAttackDmg;
+                    std::cout << "You strike for " << kPlayerAttackDmg << " damage. Warden HP: " << std::max(wardenHP, 0) << "\n";
 
-        // TODO — write the boss battle. Suggested outline (yours to refactor):
-    //
-    //   int playerHP = kPlayerStartHP;
-    //   int wardenHP = kWardenStartHP;
-    //
-    //   while (playerHP > 0 && wardenHP > 0) {
-    //       print state (HPs, last action — your choice).
-    //
-    //       try {
-    //           show menu (using your F0 container of actions).
-    //           read input.
-    //           if invalid → throw BattleException(...) [F3 — throw].
-    //           dispatch on the action:
-    //               Attack:    wardenHP -= kPlayerAttackDmg;
-    //                          if wardenHP > 0, playerHP -= kWardenAttackDmg.
-    //               Use item:  std::sort(hero.inventory.begin(),
-    //                                    hero.inventory.end(),
-    //                                    yourComparator)             [F2].
-    //                          show sorted menu, read item name.
-    //                          const Item* it = findByName<Item>(
-    //                              hero.inventory, name);             [F1]
-    //                          if (!it) throw BattleException(...);   [F3]
-    //                          apply effect (heal? buff next attack? …).
-    //                          end turn.
-    //               Inspect:   print warden state. FREE — do NOT end turn.
-    //               Flee:      return BattleOutcome::Fled.
-    //       }
-    //       catch (const std::exception& e) {                        [F3 — catch]
-    //           std::cout << "  " << e.what() << "  Try again.\n";
-    //           continue;   // re-prompt; turn does NOT advance
-    //       }
-    //   }
-    //
-    //   return wardenHP <= 0 ? BattleOutcome::Victory
-    //                        : BattleOutcome::Defeat;
-    //
+                    if (wardenHP > 0) {
+                        playerHP -= kWardenAttackDmg;
+                        std::cout << "The Warden retaliates for " << kWardenAttackDmg << " damage. Player HP: " << std::max(playerHP, 0) << "\n";
+                    }
+                    break;
+                }
+                case MenuAction::UseItem: {
+                    if (wardenHP > 0 && playerHP > 0) {
+						playerHP -= kWardenAttackDmg;
+						std::cout << "The warden strikes while you fumble. Player HP: " << std::max(playerHP, 0) << "\n";
+						useItem(hero, playerHP);
+					}
+                    break;
+                }
+                case MenuAction::InspectWarden: {
+					std::cout << "Warden of the Foundations" << std::endl << "HP: " << std::max(wardenHP, 0) << "\n Weaknesses: None" << "\n";
+                    break;
+                }
+                case MenuAction::Flee: {
+					return BattleOutcome::Fled;
+                }
+                } //end switch
+            } //end try
+            catch (const std::exception& e) {
+				std::cout << e.what() << " - try again." << std::endl;
+			} //end catch
+        } //end while
+		return wardenHP <= 0
+            ? BattleOutcome::Victory
+            : BattleOutcome::Defeat;
     }
 
 }  // namespace dungeon
