@@ -106,7 +106,7 @@ public:
     // allocates fresh nodes into the destination.
     // -----------------------------------------------------------------
 
-    // TODO Floor 4½ (Wednesday) — implement deep copy.
+    // Floor 4½ (Wednesday) — implement deep copy.
     //
     // Walk `other` from head to tail; for each node, push_back that
     // value into *this. By the time the loop ends, *this owns size_
@@ -127,7 +127,7 @@ public:
 		}
     }
 
-    // TODO Floor 4½ (Friday) — implement copy assignment.
+    // Floor 4½ (Friday) — implement copy assignment.
     //
     // Two paths:
     //
@@ -152,8 +152,12 @@ public:
     //       More code, but no surprise about why it works.
     //
     // Pick one. Defend it in your lab notes.
-    Chain& operator=(const Chain& /*other*/) {
-        // TODO Friday — copy assignment.
+    Chain& operator=(const Chain& other) {
+        if (this == &other) return *this;   // self-assignment guard
+        clear();
+        for (const Node* p = other.head_; p; p = p->next) {
+            push_back(p->data);
+        }
         return *this;
     }
 
@@ -174,7 +178,7 @@ public:
     const Node* head() const { return head_; }
     Node*       head()       { return head_; }
 
-    // TODO Floor 4½ (Monday) — return tail_.
+    // Floor 4½ (Monday) — return tail_.
     // Used by `log --oldest`, which walks the chain backward via prev.
     const Node* tail() const { return tail_;}
     Node*       tail()       { return tail_;}
@@ -190,7 +194,7 @@ public:
     // tail_ when the chain was previously empty. All three are bugs
     // waiting to surface the first time you walk the chain backward.
     //
-    // TODO Floor 4½ (Monday) — extend the body:
+    // Floor 4½ (Monday) — extend the body:
     //
     //     Node* n = new Node(value, /*prev=*/nullptr, /*next=*/head_);
     //     if (head_ != nullptr) head_->prev = n;   // old head now has a prev
@@ -206,7 +210,7 @@ public:
         ++size_;
     }
 
-    // TODO Floor 4½ (Monday) — append `value` at the tail. O(1) thanks
+    // Floor 4½ (Monday) — append `value` at the tail. O(1) thanks
     // to `tail_`. The body is the mirror of push_front's Floor 4½ form:
     //
     //     Node* n = new Node(value, /*prev=*/tail_, /*next=*/nullptr);
@@ -222,7 +226,7 @@ public:
 		++size_;
     }
 
-    // TODO Floor 4½ (Friday) — remove the front node. O(1).
+    // Floor 4½ (Friday) — remove the front node. O(1).
     //
     // Sketch:
     //   1. If empty, return (no-op is fine — document your choice).
@@ -232,10 +236,20 @@ public:
     //      If it IS null, the chain is now empty — set tail_ = nullptr too.
     //   5. --size_.
     void pop_front() {
-        // TODO Friday
+		if (head_ == nullptr) return; // no-op if empty
+        Node* new_head = head_->next; // save new head
+        delete head_; // delete old head
+        head_ = new_head; // update head_
+        if (head_ != nullptr) {
+            head_->prev = nullptr; // new head's prev is nullptr
+        }
+        else {
+            tail_ = nullptr; // chain is now empty, set tail_ to nullptr
+        }
+		--size_; // decrement size
     }
 
-    // TODO Floor 4½ (Friday) — remove the back node. O(1) BECAUSE of prev.
+    // Floor 4½ (Friday) — remove the back node. O(1) BECAUSE of prev.
     //
     // Sketch:
     //   1. If empty, return.
@@ -248,7 +262,16 @@ public:
     // Question for the lab: why is this O(n) on a singly-linked chain
     // *even if it has a tail_ pointer*?
     void pop_back() {
-        // TODO Friday
+		if (tail_ == nullptr) return; // no-op if empty
+        Node* new_tail = tail_->prev; // save new tail
+        delete tail_; // delete old tail
+        tail_ = new_tail; // update tail_
+        if (tail_ != nullptr) {
+            tail_->next = nullptr; // new tail's next is nullptr
+        }
+        else {
+            head_ = nullptr; // chain is now empty, set head_ to nullptr
+		}
     }
 
     // Walk and delete every node. Floor 4 version — unchanged loop body,
