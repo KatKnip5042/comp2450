@@ -68,14 +68,12 @@ namespace dungeon {
             return;
         }
         std::size_t printed = 0;
-        for (const auto* p = hero.eventLog.head();
+        for (const auto* p = hero.eventLog.head(); //change here (head vs tail)
             p != nullptr && (n == 0 || printed < n);
-            p = p->next, ++printed) {
-            std::cout << "  " << std::setw(2) << std::right
-                << (printed + 1) << ".  " << p->data << "\n";
+            p = p->next, ++printed) { //change here (next vs prev)
+            std::cout << "  " << std::setw(2) << std::right << (printed + 1) << ".  " << p->data << "\n";
         }
-        std::cout << "  (newest first; chain length "
-            << hero.eventLog.size() << ")\n";
+        std::cout << "  (newest first; chain length " << hero.eventLog.size() << ")\n"; //change here (newest vs oldest)
     }
 
     // Render the OLDEST `n` event-log entries, oldest first. Floor 4½'s
