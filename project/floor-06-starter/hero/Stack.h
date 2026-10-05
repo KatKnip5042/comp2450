@@ -59,21 +59,21 @@ public:
 
     // Push `value` onto the top of the stack. O(1).
     //
-    // TODO Floor 6 (Monday). Body is one line.
+    // Floor 6 (Monday). Body is one line.
     //     chain_.push_front(value);
     void push(const T& value) {
         (void)value;   // silence unused-parameter warning while stubbed
-        // TODO Monday
+        chain_.push_front(value);
     }
 
     // Remove the top of the stack. O(1). No-op on empty (matches std::stack
     // behavior — calling pop on an empty stack is undefined, but our
     // Chain::pop_front is already a safe no-op on empty).
     //
-    // TODO Floor 6 (Monday). Body is one line.
+    // Floor 6 (Monday). Body is one line.
     //     chain_.pop_front();
     void pop() {
-        // TODO Monday
+        chain_.pop_front();
     }
 
     // Read the top of the stack. O(1). PROVIDED — you do not write this.
@@ -96,19 +96,19 @@ public:
 
     // Number of items currently on the stack.
     //
-    // TODO Floor 6 (Monday). Body is one line.
+    // Floor 6 (Monday). Body is one line.
     //     return chain_.size();
     std::size_t size() const {
-        return 0;   // TODO Monday
+        return chain_.size();
     }
 
     // True iff size() == 0.
     //
-    // TODO Floor 6 (Monday). Body is one line — and you don't even need
+    // Floor 6 (Monday). Body is one line — and you don't even need
     // to touch chain_; you can delegate to your own size().
     //     return size() == 0;
     bool empty() const {
-        return true;   // TODO Monday
+        return size() == 0;
     }
 
 private:
