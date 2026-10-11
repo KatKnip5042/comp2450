@@ -250,9 +250,16 @@ int main() {
                 hero.eventLog.push_front("sort inventory by " + criterion);
             }
             else if (cmd == "undo") {
-                // TODO Floor 6 (Friday) — the undo dispatcher.
-                //
-                // The body is short. In English:
+                if (hero.undoStack.empty()) {
+                    std::cout << "Nothing to undo.\n";
+                }
+                else {
+					const UndoAction& a = hero.undoStack.top();
+                    hero.inventory = a.inventorySnapshot;
+                    std::cout << "Undid: " << a.description << "\n";
+                    hero.eventLog.push_front("undo (" + a.description + ")");
+                    hero.undoStack.pop();
+                }
                 //   1. If hero.undoStack is empty, print "Nothing to undo."
                 //      and return — there is no prior action to reverse.
                 //   2. Otherwise:
@@ -279,7 +286,6 @@ int main() {
                 //
                 // The order matters: bind the reference BEFORE pop().
                 // Once you pop, the Action you were looking at is gone.
-                std::cout << "(undo not yet implemented — TODO Friday in main.cpp)\n";
             }
             else if (cmd == "lint") {
                 if (rest.empty()) {
