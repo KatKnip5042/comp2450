@@ -61,20 +61,19 @@ public:
 
     // Enqueue `value` at the back of the queue. O(1).
     //
-    // TODO Floor 7 (Monday). Body is one line.
+    // Floor 7 (Monday). Body is one line.
     //     chain_.push_back(value);
     void enqueue(const T& value) {
-        (void)value;   // silence unused-parameter warning while stubbed
-        // TODO Monday
+		chain_.push_back(value);
     }
 
     // Remove the front of the queue. O(1). No-op on empty (Chain's
     // pop_front is already a safe no-op on empty).
     //
-    // TODO Floor 7 (Monday). Body is one line.
+    // Floor 7 (Monday). Body is one line.
     //     chain_.pop_front();
     void dequeue() {
-        // TODO Monday
+        chain_.pop_front();
     }
 
     // Read the front of the queue (the oldest enqueued item). O(1).
@@ -97,19 +96,19 @@ public:
 
     // Number of items currently in the queue.
     //
-    // TODO Floor 7 (Monday). Body is one line.
+    // Floor 7 (Monday). Body is one line.
     //     return chain_.size();
     std::size_t size() const {
-        return 0;   // TODO Monday
+        return chain_.size();
     }
 
     // True iff size() == 0.
     //
-    // TODO Floor 7 (Monday). Body is one line — delegate to size() or
+    // Floor 7 (Monday). Body is one line — delegate to size() or
     // to chain_.empty(), your choice.
     //     return size() == 0;
     bool empty() const {
-        return true;   // TODO Monday
+		return size() == 0;
     }
 
 private:
