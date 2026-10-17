@@ -62,7 +62,6 @@ public:
     // Floor 6 (Monday). Body is one line.
     //     chain_.push_front(value);
     void push(const T& value) {
-        (void)value;   // silence unused-parameter warning while stubbed
         chain_.push_front(value);
     }
 
