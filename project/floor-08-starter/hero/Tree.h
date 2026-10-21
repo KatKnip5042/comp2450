@@ -106,8 +106,9 @@ public:
     //     parent->children.push_back(child);
     //     return child;
     Node* addChild(Node* parent, const T& value) {
-        (void)parent; (void)value;   // silence unused-parameter warnings while stubbed
-        return nullptr;              // TODO Monday
+		Node* child = new Node(value, parent);
+		parent->children.push_back(child);
+		return child;
     }
 
     // Total number of nodes in the tree. Recursive: one node, plus the
@@ -144,7 +145,7 @@ public:
     // node, record it, enqueue its children." The Queue<T> you built last
     // week is exactly the bookkeeping that makes closest-first happen.
     //
-    // TODO Floor 8 (Wednesday). Iterative, no recursion. Sketch:
+    // Floor 8 (Wednesday). Iterative, no recursion. Sketch:
     //     if (root_ == nullptr) return out;
     //     Queue<Node*> q;
     //     q.enqueue(root_);
@@ -156,9 +157,19 @@ public:
     //             q.enqueue(cur->children[i]);
     //     }
     std::vector<T> levelOrder() const {
-        std::vector<T> out;
-        // TODO Wednesday
-        return out;
+		std::vector<T> out;
+		if (root_ == nullptr) return out;
+		Queue<Node*> q;
+		q.enqueue(root_);
+        while (!q.empty()) {
+            Node* cur = q.front();
+            q.dequeue();
+            out.push_back(cur->data);
+            for (std::size_t i = 0; i < cur->children.size(); ++i) {
+                q.enqueue(cur->children[i]);
+            }
+        }
+
     }
 
     // ----- Friday ----------------------------------------------------
@@ -217,35 +228,46 @@ private:
     //         total += countFrom(n->children[i]);
     //     return total;
     static std::size_t countFrom(const Node* n) {
-        (void)n;
-        return 0;   // TODO Monday
+		if (n == nullptr) return 0;
+		std::size_t total = 1;
+        for (std::size_t i = 0; i < n->children.size(); ++i) {
+			total += countFrom(n->children[i]);
+        }
+		return total;
     }
 
     // Height (in edges) of the subtree rooted at n. A null subtree and a
     // leaf are both 0; otherwise 1 + the tallest child subtree.
     //
-    // TODO Floor 8 (Monday). Sketch:
+    // Floor 8 (Monday). Sketch:
     //     if (n == nullptr || n->children.size() == 0) return 0;
     //     std::size_t best = 0;
     //     for (std::size_t i = 0; i < n->children.size(); ++i)
     //         best = std::max(best, heightFrom(n->children[i]));
     //     return 1 + best;
     static std::size_t heightFrom(const Node* n) {
-        (void)n;
-        return 0;   // TODO Monday
+		if (n == nullptr || n->children.size() == 0) return 0;
+        std::size_t best = 0;
+        for (std::size_t i = 0; i < n->children.size(); ++i) {
+            best = std::max(best, heightFrom(n->children[i]));
+        }
+		return 1 + best;
     }
 
     // Append this node's data, THEN each child's subtree in order. The
     // "node first, then children" ordering is what makes it PRE-order.
     //
-    // TODO Floor 8 (Wednesday). Sketch:
+    // Floor 8 (Wednesday). Sketch:
     //     if (n == nullptr) return;
     //     out.push_back(n->data);
     //     for (std::size_t i = 0; i < n->children.size(); ++i)
     //         preOrderInto(n->children[i], out);
     static void preOrderInto(const Node* n, std::vector<T>& out) {
-        (void)n; (void)out;
-        // TODO Wednesday
+		if (n == nullptr) return;
+		out.push_back(n->data);
+        for (std::size_t i = 0; i < n->children.size(); ++i) {
+            preOrderInto(n->children[i], out);
+        }
     }
 
     // Recursive search: return the node whose data == value, or nullptr.
