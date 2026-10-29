@@ -101,7 +101,7 @@ public:
     // parent->children, and return the new node so the caller can hang
     // grandchildren off it. O(1).
     //
-    // TODO Floor 8 (Monday). About three lines:
+    // Floor 8 (Monday). About three lines:
     //     Node* child = new Node(value, parent);
     //     parent->children.push_back(child);
     //     return child;
@@ -169,7 +169,7 @@ public:
                 q.enqueue(cur->children[i]);
             }
         }
-
+        return out;
     }
 
     // ----- Friday ----------------------------------------------------
@@ -182,7 +182,7 @@ public:
     // parent pointer: follow `parent` until it is nullptr, collecting as
     // you go, then reverse. That part is written for you here.
     //
-    // TODO Floor 8 (Friday): write findFrom(root_, value) below.
+    // Floor 8 (Friday): write findFrom(root_, value) below.
     std::vector<T> lineage(const T& value) const {
         std::vector<T> path;
         const Node* n = findFrom(root_, value);
@@ -221,7 +221,7 @@ private:
 
     // Count this node plus every node beneath it. A null subtree has 0.
     //
-    // TODO Floor 8 (Monday). Sketch:
+    // Floor 8 (Monday). Sketch:
     //     if (n == nullptr) return 0;
     //     std::size_t total = 1;
     //     for (std::size_t i = 0; i < n->children.size(); ++i)
@@ -281,8 +281,18 @@ private:
     //         if (const Node* hit = findFrom(n->children[i], value)) return hit;
     //     return nullptr;
     static const Node* findFrom(const Node* n, const T& value) {
-        (void)n; (void)value;
-        return nullptr;   // TODO Friday
+        if (n == nullptr) {
+			return nullptr;
+        }
+        if (n->data == value) {
+            return n;
+        }
+        for (std::size_t i = 0; i < n->children.size(); ++i) {
+            if (const Node* hit = findFrom(n->children[i], value)) {
+                return hit;
+            }
+		}
+		return nullptr;
     }
 };
 
