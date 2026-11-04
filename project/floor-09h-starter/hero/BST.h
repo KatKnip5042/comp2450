@@ -203,26 +203,34 @@ private:
     // Balance factor of n: signedHeight(left) - signedHeight(right). A null
     // node is 0. Positive = left-heavy, negative = right-heavy.
     //
-    // TODO Floor 9½ (Monday). Body is two lines:
+    // Floor 9½ (Monday). Body is two lines:
     //     if (n == nullptr) return 0;
     //     return signedHeight(n->left) - signedHeight(n->right);
     static int balanceFactorOf(const Node* n) {
-        (void)n;
-        return 0;   // TODO Monday — stub reports every tree as perfectly level
+        if (n == nullptr) {
+            return 0;
+        }
+		return signedHeight(n->left) - signedHeight(n->right);
     }
 
     // True iff the subtree at n is height-balanced at EVERY node. Check THIS
     // node's balance factor is within [-1, 1], then require both children to
     // be balanced too.
     //
-    // TODO Floor 9½ (Monday). Sketch:
+    // Floor 9½ (Monday). Sketch:
     //     if (n == nullptr) return true;
     //     const int bf = balanceFactorOf(n);
     //     if (bf < -1 || bf > 1) return false;
     //     return isBalancedFrom(n->left) && isBalancedFrom(n->right);
     static bool isBalancedFrom(const Node* n) {
-        (void)n;
-        return true;   // TODO Monday — stub claims every tree is balanced
+        if (n == nullptr) {
+            return true;
+		}
+        const int bf = balanceFactorOf(n);
+        if (bf < -1 || bf > 1) {
+            return false;
+        }
+		return isBalancedFrom(n->left) && isBalancedFrom(n->right);
     }
 
     // ----- Wednesday: the rotation primitive -------------------------
@@ -240,26 +248,32 @@ private:
            / \                        / \
           a   b                      b   c
     */
-    // TODO Floor 9½ (Wednesday). Sketch:
+    // Floor 9½ (Wednesday). Sketch:
     //     Node* pivot  = n->left;
     //     n->left      = pivot->right;
     //     pivot->right = n;
     //     return pivot;
     static Node* rotateRight(Node* n) {
-        return n;   // TODO Wednesday — stub returns the tree unrotated
+		Node* pivvot = n->left;
+		n->left = pivvot->right;
+		pivvot->right = n;
+		return pivvot;
     }
 
     // Left rotation around n — the mirror of rotateRight. n's RIGHT child
     // becomes the new subtree root. Precondition: n and n->right non-null.
     // Also in-order-preserving.
     //
-    // TODO Floor 9½ (Wednesday). Sketch:
+    // Floor 9½ (Wednesday). Sketch:
     //     Node* pivot = n->right;
     //     n->right    = pivot->left;
     //     pivot->left = n;
     //     return pivot;
     static Node* rotateLeft(Node* n) {
-        return n;   // TODO Wednesday — stub returns the tree unrotated
+		Node* pivot = n->right;
+		n->right = pivot->left;
+		pivot->left = n;
+		return pivot;
     }
 
     // ----- Friday: pick the rotation ---------------------------------
