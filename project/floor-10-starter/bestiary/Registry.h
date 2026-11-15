@@ -108,21 +108,22 @@ public:
     //                                        here [] is correct — we MEAN to
     //                                        create/update the entry)
     //
-    // TODO Floor 10 (Monday). Stub is empty -> phases 1–6 all FAIL (everything
+    // Floor 10 (Monday). Stub is empty -> phases 1–6 all FAIL (everything
     // is empty). Monday's first edit lights phase 1.
     void index(const Monster& m) {
-        (void)m;
-        // TODO Monday — populate byName_, weaknesses_, and weaknessCounts_.
+		byName_[m.name] = m;
+		weaknesses_.insert(m.weakness);
+		weaknessCounts_[m.weakness] += 1;
     }
 
     // Return whether a monster with that name is in the registry — using the
     // MAP, in one call, NOT a loop. The "membership in one call" beat.
     //
-    // TODO Floor 10 (Monday). Sketch:
+    // Floor 10 (Monday). Sketch:
     //     return byName_.count(name) > 0;     // (or: find(name) != end())
     bool knows(const std::string& name) const {
-        (void)name;
-        return false;   // TODO Monday — stub never knows anyone
+        //count is either 0 or 1 on a map
+        return byName_.count(name) > 0;
     }
 
     // ----- Wednesday: three containers, three one-liners -------------
@@ -131,35 +132,34 @@ public:
     // map::find and checking against end(). The direct one-liner replacement
     // for Floor 9's whole recursive findFrom descent. Return &it->second.
     //
-    // TODO Floor 10 (Wednesday). Sketch:
+    // Floor 10 (Wednesday). Sketch:
     //     auto it = byName_.find(name);
     //     return it == byName_.end() ? nullptr : &it->second;
     const Monster* recall(const std::string& name) const {
-        (void)name;
-        return nullptr;   // TODO Wednesday — stub finds no one
+		auto it = byName_.find(name);
+		return it == byName_.end() ? nullptr : &it->second;
     }
 
     // Return whether ANY monster has weakness w — using set::count on
     // weaknesses_. Membership against the SET, contrasted with knows()'s
     // membership against the MAP.
     //
-    // TODO Floor 10 (Wednesday). Sketch:
+    // Floor 10 (Wednesday). Sketch:
     //     return weaknesses_.count(w) > 0;
     bool hasWeakness(const std::string& w) const {
-        (void)w;
-        return false;   // TODO Wednesday — stub claims nothing is weak to anything
+		return weaknesses_.count(w) > 0;
     }
 
     // Return how many monsters share weakness w, or 0 if none — by reading
     // weaknessCounts_ with FIND, never operator[]. This method is const, so []
     // won't even compile here: the design makes the Phantom Key bug impossible.
     //
-    // TODO Floor 10 (Wednesday). Sketch:
+    // Floor 10 (Wednesday). Sketch:
     //     auto it = weaknessCounts_.find(w);
     //     return it == weaknessCounts_.end() ? 0 : it->second;
     int countWeakness(const std::string& w) const {
-        (void)w;
-        return 0;   // TODO Wednesday — stub counts nothing
+		auto it = weaknessCounts_.find(w);
+		return it == weaknessCounts_.end() ? 0 : it->second;
     }
 
     // ----- Friday: mutate, staying consistent ------------------------
@@ -174,7 +174,7 @@ public:
     // method; it mirrors Floor 9's forget, but now it is library calls, not
     // pointer surgery.
     //
-    // TODO Floor 10 (Friday). Sketch:
+    // Floor 10 (Friday). Sketch:
     //     auto it = byName_.find(name);
     //     if (it == byName_.end()) return false;
     //     const std::string w = it->second.weakness;
@@ -185,8 +185,17 @@ public:
     //     }
     //     return true;
     bool forget(const std::string& name) {
-        (void)name;
-        return false;   // TODO Friday — stub forgets nothing
+		auto it = byName_.find(name);
+        if (it == byName_.end()) {
+            return false;
+        }
+		const std::string w = it->second.weakness;
+		byName_.erase(it);
+        if (--weaknessCounts_[w] == 0) {
+            weaknessCounts_.erase(w);
+            weaknesses_.erase(w);
+        }
+		return true;
     }
 
 private:
