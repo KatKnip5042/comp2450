@@ -134,14 +134,15 @@ public:
         std::vector<Chain<Monster>> grown(newBucketCount);
         for (const Chain<Monster>& bucket : buckets_) {
             for (const Monster& m : bucket) {
+				grown[hashKey(m.name) % newBucketCount].push_back(m);
                 // ===== YOU WRITE (Friday, with rehashIfNeeded #6) =====
                 // Compute m's home in the NEW, bigger array and push it there.
                 // It is one line. Sketch:
                 //     grown[hashKey(m.name) % newBucketCount].push_back(m);
                 // (count_ does NOT change here — rehash moves items, it does not
-                //  add or drop any. The TODO stub below files nothing, so after a
+                //  add or drop any. The stub below files nothing, so after a
                 //  rehash the table would be EMPTY and self-test phase 6 FAILs.)
-                (void)m;   // TODO Friday — re-file m into grown[...]
+                // Friday — re-file m into grown[...]
             }
         }
         buckets_.swap(grown);
@@ -166,11 +167,15 @@ public:
     // Returns the raw code; it is NOT yet reduced to a bucket. The static_cast
     // to unsigned char matters: a plain char can be negative.
     //
-    // TODO Floor 11 (Monday). Stub returns 0 -> every name hashes to the same
+    // Floor 11 (Monday). Stub returns 0 -> every name hashes to the same
     // code, so phase 1 (deterministic-AND-distinct) FAILs.
     std::size_t hashKey(const std::string& name) const {
-        (void)name;
-        return 0;   // TODO Monday — multiplicative string hash (h = h*31 + c)
+        // Monday — multiplicative string hash (h = h*31 + c)
+        std::size_t h = 0;
+        for (char c : name) {
+            h = h * 31 + static_cast<unsigned char>(c);
+        }
+        return h;
     }
 
     // Reduce the hash code to a valid bucket index — the MODULO HASH step
@@ -179,11 +184,10 @@ public:
     // It MUST be `% bucketCount`, never an unchecked index. The constructor
     // guarantees buckets_.size() >= 1, so this can never divide by zero.
     //
-    // TODO Floor 11 (Monday). Stub returns 0 (a VALID index, so no crash), but
+    // Floor 11 (Monday). Stub returns 0 (a VALID index, so no crash), but
     // it sends every name to bucket 0, so distinctness/correctness phases FAIL.
     std::size_t bucketIndex(const std::string& name) const {
-        (void)name;
-        return 0;   // TODO Monday — return hashKey(name) % buckets_.size();
+        return hashKey(name) % buckets_.size();
     }
 
     // Add m to its home bucket. Compute bucketIndex(m.name); if no monster with
@@ -197,7 +201,7 @@ public:
     // adds the dup-check + update-in-place. The rehashIfNeeded() call is part of
     // the final body (Friday it actually does something).
     //
-    // TODO Floor 11 (Monday→Wednesday). Sketch:
+    // Floor 11 (Monday→Wednesday). Sketch:
     //     std::size_t i = bucketIndex(m.name);
     //     for (Monster& existing : buckets_[i]) {       // Wed: dup-check
     //         if (existing.name == m.name) { existing = m; return false; }
@@ -207,8 +211,17 @@ public:
     //     rehashIfNeeded();                              // Fri: grow if crowded
     //     return true;
     bool insert(const Monster& m) {
-        (void)m;
-        return false;   // TODO Monday — push m into bucketIndex(m.name)'s chain
+        // Monday — push m into bucketIndex(m.name)'s chain
+		std::size_t i = bucketIndex(m.name);
+        for (Monster& existing : buckets_[i]) {
+            if (existing.name == m.name) {
+                existing = m; return false;
+            }
+		}
+		buckets_[i].push_back(m);
+        ++count_;
+        rehashIfNeeded();
+		return true;
     }
 
     // ----- Wednesday: one short list, not the whole table ------------
@@ -222,14 +235,20 @@ public:
     // find must compare the NAME, not just the bucket: two names can collide
     // into the same bucket, so returning the first item there is wrong.
     //
-    // TODO Floor 11 (Wednesday). Sketch:
+    // Floor 11 (Wednesday). Sketch:
     //     std::size_t i = bucketIndex(name);
     //     for (const Monster& m : buckets_[i])
     //         if (m.name == name) return &m;
     //     return nullptr;
     const Monster* find(const std::string& name) const {
-        (void)name;
-        return nullptr;   // TODO Wednesday — scan only bucketIndex(name)'s chain
+        // Wednesday — scan only bucketIndex(name)'s chain
+		std::size_t i = bucketIndex(name);
+        for (const Monster& m : buckets_[i]) {
+            if (m.name == name) {
+                return &m;
+            }
+        }
+		return nullptr;
     }
 
     // Remove the named monster: compute its bucket, remove the matching item
@@ -239,15 +258,21 @@ public:
     // you whether it found one. Do NOT clear the whole bucket: erase removes
     // only the one item, leaving any colliding neighbors in place.
     //
-    // TODO Floor 11 (Wednesday). Sketch:
+    // Floor 11 (Wednesday). Sketch:
     //     std::size_t i = bucketIndex(name);
     //     bool removed = buckets_[i].eraseFirst(
     //         [&](const Monster& m) { return m.name == name; });
     //     if (removed) --count_;
     //     return removed;
     bool erase(const std::string& name) {
-        (void)name;
-        return false;   // TODO Wednesday — eraseFirst from bucketIndex(name)'s chain
+        // Wednesday — eraseFirst from bucketIndex(name)'s chain
+		std::size_t i = bucketIndex(name);
+        bool removed = buckets_[i].eraseFirst(
+            [&](const Monster& m) { return m.name == name; });
+        if (removed) {
+            --count_;
+        }
+        return removed;
     }
 
     // ----- Friday: keep the whisper a whisper ------------------------
@@ -259,12 +284,16 @@ public:
     // in the provided rehash() driver above — and the ONE line inside it (the
     // re-file) is the other half of this beat.
     //
-    // TODO Floor 11 (Friday). Sketch:
+    // Floor 11 (Friday). Sketch:
     //     if (loadFactor() > kMaxLoadFactor)
     //         rehash(buckets_.size() * 2);
     //     return buckets_.size();
     std::size_t rehashIfNeeded() {
-        return buckets_.size();   // TODO Friday — grow when loadFactor() > kMaxLoadFactor
+        // Friday — grow when loadFactor() > kMaxLoadFactor
+        if (loadFactor() > kMaxLoadFactor) {
+            rehash(buckets_.size() * 2);
+		}
+		return buckets_.size();
     }
 
 private:
